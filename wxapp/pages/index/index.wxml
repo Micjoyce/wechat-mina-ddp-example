@@ -1,0 +1,14 @@
+<!--index.wxml-->
+<view class="container">
+  <view  bindtap="bindViewTap" class="userinfo">
+    <image class="userinfo-avatar" src="{{userInfo.avatarUrl}}" background-size="cover"></image>
+  </view>
+  <view>
+    <input class="msg-input" bindinput="bindKeyInput" placeholder="输入消息" auto-focus/>
+  </view>
+  <button bindtap="sendMessage">发送消息</button>
+  <view class="msg-item" wx:for="{{messages}}" wx:for-index="idx" wx:for-item="msg" wx:key="{{msg._id}}">
+    <image class="msg-avatar" src="{{userInfo.avatarUrl}}" background-size="cover"></image>
+    {{msg.msg}}
+  </view>
+</view>

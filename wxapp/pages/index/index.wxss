@@ -1,0 +1,28 @@
+/**index.wxss**/
+.userinfo {
+  display: flex;
+}
+
+.userinfo-avatar {
+  width: 128rpx;
+  height: 128rpx;
+  border-radius: 50%;
+}
+
+.msg-input{
+  width: 500rpx;
+  margin: 20rpx;
+  border: 1px solid red;
+}
+
+.msg-item{
+  align-self: flex-start;
+}
+.msg-avatar{
+  width: 50rpx;
+  height: 50rpx;
+  border-radius: 50%;
+}
+.userinfo-nickname {
+  color: #aaa;
+}
