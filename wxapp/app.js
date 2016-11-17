@@ -12,6 +12,16 @@ App({
     Meteor.connect('ws://localhost:3000/websocket');
     wx.Meteor = Meteor;
 
+    // Meteor streamer
+    var Streamer = require('./meteor/stream/Streamer');
+    wx.Streamer = Streamer;
+
+    var msgStreamer = new Streamer("message");
+    wx.msgStreamer = msgStreamer;
+    msgStreamer.on('message', function(msg) {
+      console.log(msg);
+    });
+
   },
   getUserInfo:function(cb){
     var that = this
