@@ -61,20 +61,20 @@ Page({
     Meteor.Tracker.autorun(function(){
       console.log("message.all 订阅状态",subReady.ready())
     });
-    DDP.on("added", ({collection, id, fields}) => {
+    DDP.on("added", _.debounce(({collection, id, fields}) => {
       this.setData({
         messages: sortMessage(Meteor.collection(collection).find())
       })
-    });
-    DDP.on("changed", ({collection, id, fields}) => {
+    }), 200);
+    DDP.on("changed", _.debounce(({collection, id, fields}) => {
       this.setData({
         messages: sortMessage(Meteor.collection(collection).find())
       })
-    });
-    DDP.on("removed", ({collection, id}) => {
+    }), 200);
+    DDP.on("removed", _.debounce(({collection, id}) => {
       this.setData({
         messages: sortMessage(Meteor.collection(collection).find())
       })
-    });
+    }), 200);
   }
 })

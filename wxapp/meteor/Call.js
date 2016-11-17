@@ -8,8 +8,10 @@ module.exports = function(eventName) {
 
 
   const id = Data.ddp.method(eventName, args);
+  console.log(id);
   Data.calls.push({
     id: id,
     callback: callback
   });
+  console.log(Data.calls[0])
 }
