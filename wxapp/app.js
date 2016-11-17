@@ -16,6 +16,13 @@ App({
     var Streamer = require('./meteor/stream/Streamer');
     wx.Streamer = Streamer;
 
+    // Meteor streamer
+    var Notifications = require('./lib/Notifications');
+    wx.Notifications = Notifications;
+    Notifications.onAll("sayHello", function(msg){
+      console.log("sayHello", msg);
+    });
+
     var msgStreamer = new Streamer("message");
     wx.msgStreamer = msgStreamer;
     msgStreamer.on('message', function(msg) {
@@ -34,6 +41,13 @@ App({
           wx.getUserInfo({
             success: function (res) {
               that.globalData.userInfo = res.userInfo
+              var options = {email: "test@test.com", pass: "test"};
+              wx.Meteor.call("registerUser", options, function(err, result){
+                console.log("注册" ,err, result);
+                wx.Meteor.loginWithPassword(options.email, options.pass, function (err, result) {
+                  console.log("登录", err, result);
+                });
+              });
               typeof cb == "function" && cb(that.globalData.userInfo)
             }
           })
