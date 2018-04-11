@@ -1,11 +1,5 @@
 import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
-msgStreamer = new Meteor.Streamer('message');
-msgStreamer.on("message", function(err, result){
-  console.log(err, result);
-
-});
-console.log(msgStreamer)
 
 import './main.html';
 

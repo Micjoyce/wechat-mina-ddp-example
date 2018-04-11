@@ -1,80 +1,54 @@
 //index.js
 //获取应用实例
-var app = getApp()
-var Meteor = wx.Meteor;
-var util = require('../../utils/util.js')
-var _ = Meteor.underscore;
-
-function sortMessage(msgArr){
-  if (!_.isArray(msgArr)) {
-    return msgArr;
-  }
-  return msgArr.sort(function(a, b){
-    return new Date(b._updateAt) - new Date(a._updateAt);
-  });
-}
+const app = getApp()
 
 Page({
   data: {
-    messages: [],
+    motto: 'Hello World',
     userInfo: {},
-    inputValue: ""
+    hasUserInfo: false,
+    canIUse: wx.canIUse('button.open-type.getUserInfo')
   },
   //事件处理函数
-  bindKeyInput: function(e) {
-    this.setData({
-      inputValue: e.detail.value
-    })
-  },
-  sendMessage: function(e) {
-    var self = this;
-    var msg = this.data.inputValue;
-    if (!msg || msg.length < 1) {
-      return;
-    }
-    Meteor.call("sendMessage", msg, function(err, result) {
-      if (!err) {
-        self.setData({
-          inputValue: ""
-        })
-        console.log("发送成功");
-      }
-    })
-  },
   bindViewTap: function() {
     wx.navigateTo({
       url: '../logs/logs'
     })
   },
   onLoad: function () {
-    var that = this
-    //调用应用实例的方法获取全局数据
-    app.getUserInfo(function(userInfo){
-      //更新数据
-      that.setData({
-        userInfo:userInfo
-      })
-    });
-    // 数据订阅
-    var subReady = Meteor.subscribe('message.all');
-    var DDP = Meteor.getData().ddp;
-    Meteor.Tracker.autorun(function(){
-      console.log("message.all 订阅状态",subReady.ready())
-    });
-    DDP.on("added", _.debounce(({collection, id, fields}) => {
+    if (app.globalData.userInfo) {
       this.setData({
-        messages: sortMessage(Meteor.collection(collection).find())
+        userInfo: app.globalData.userInfo,
+        hasUserInfo: true
       })
-    }), 200);
-    DDP.on("changed", _.debounce(({collection, id, fields}) => {
-      this.setData({
-        messages: sortMessage(Meteor.collection(collection).find())
+    } else if (this.data.canIUse){
+      // 由于 getUserInfo 是网络请求，可能会在 Page.onLoad 之后才返回
+      // 所以此处加入 callback 以防止这种情况
+      app.userInfoReadyCallback = res => {
+        this.setData({
+          userInfo: res.userInfo,
+          hasUserInfo: true
+        })
+      }
+    } else {
+      // 在没有 open-type=getUserInfo 版本的兼容处理
+      wx.getUserInfo({
+        success: res => {
+          app.globalData.userInfo = res.userInfo
+          this.setData({
+            userInfo: res.userInfo,
+            hasUserInfo: true
+          })
+        }
       })
-    }), 200);
-    DDP.on("removed", _.debounce(({collection, id}) => {
-      this.setData({
-        messages: sortMessage(Meteor.collection(collection).find())
-      })
-    }), 200);
+    }
+  },
+  getUserInfo: function(e) {
+    console.log(e)
+    app.globalData.userInfo = e.detail.userInfo
+    this.setData({
+      userInfo: e.detail.userInfo,
+      hasUserInfo: true
+    })
   }
 })

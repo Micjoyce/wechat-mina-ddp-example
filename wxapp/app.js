@@ -1,61 +1,74 @@
 //app.js
+import Meteor from './meteor/index';
+
+
 App({
   onLaunch: function () {
-    //调用API从本地缓存中获取数据
+    // 展示本地存储能力
     var logs = wx.getStorageSync('logs') || []
     logs.unshift(Date.now())
-    wx.setStorageSync('logs', logs);
+    wx.setStorageSync('logs', logs)
 
-    // start ddp connect
-    var Meteor = require('./meteor/Meteor')
-    var _ = Meteor.underscore;
-    Meteor.connect('ws://localhost:3000/websocket');
-    wx.Meteor = Meteor;
+    // 链接Meteor后端
 
-    // Meteor streamer
-    var Streamer = require('./meteor/stream/Streamer');
-    wx.Streamer = Streamer;
+    Meteor.connect('http://localhost:3000')
 
-    // Meteor streamer
-    var Notifications = require('./lib/Notifications');
-    wx.Notifications = Notifications;
-    Notifications.onAll("sayHello", function(msg){
-      // console.log("sayHello", msg);
+    Meteor.ddp.on('disconnected', () => {
+      console.log('Meteor ddp disconnected');
+    });
+    
+    Meteor.ddp.on('connected', () => {
+      console.log('Meteor ddp connected');
+      // list Meteor stream message
+      Meteor.ddp.on('stream-message', (ddpMessage) => {
+        console.log(ddpMessage);
+      });
+      // dingy
+      Meteor.subscribe('stream-message', 'all', false)
+
+      // call send Message
+      Meteor.call('sendMessage', 'test message')
+        .then(result => {
+          console.log(result);
+        })
+        .catch(err => {
+          console.log(err);
+        })
     });
 
-    var msgStreamer = new Streamer("message");
-    wx.msgStreamer = msgStreamer;
-    msgStreamer.on('message', function(msg) {
-      console.log(msg);
+    Meteor.ddp.on('error', (err) => {
+      console.log('Meteor ddp connect error', err);
     });
 
-  },
-  getUserInfo:function(cb){
-    var that = this
-    if(this.globalData.userInfo){
-      typeof cb == "function" && cb(this.globalData.userInfo)
-    }else{
-      //调用登录接口
-      wx.login({
-        success: function () {
+
+    // 登录
+    wx.login({
+      success: res => {
+        // 发送 res.code 到后台换取 openId, sessionKey, unionId
+      }
+    })
+    // 获取用户信息
+    wx.getSetting({
+      success: res => {
+        if (res.authSetting['scope.userInfo']) {
+          // 已经授权，可以直接调用 getUserInfo 获取头像昵称，不会弹框
           wx.getUserInfo({
-            success: function (res) {
-              that.globalData.userInfo = res.userInfo
-              var options = {email: "test@test.com", pass: "test"};
-              wx.Meteor.call("registerUser", options, function(err, result){
-                console.log("注册" ,err, result);
-                wx.Meteor.loginWithPassword(options.email, options.pass, function (err, result) {
-                  console.log("登录", err, result);
-                });
-              });
-              typeof cb == "function" && cb(that.globalData.userInfo)
+            success: res => {
+              // 可以将 res 发送给后台解码出 unionId
+              this.globalData.userInfo = res.userInfo
+
+              // 由于 getUserInfo 是网络请求，可能会在 Page.onLoad 之后才返回
+              // 所以此处加入 callback 以防止这种情况
+              if (this.userInfoReadyCallback) {
+                this.userInfoReadyCallback(res)
+              }
             }
           })
         }
-      })
-    }
+      }
+    })
   },
-  globalData:{
-    userInfo:null
+  globalData: {
+    userInfo: null
   }
 })
