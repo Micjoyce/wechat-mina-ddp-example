@@ -4,17 +4,20 @@ import sha256 from './sha256';
 const TOKEN_KEY = 'mina_meteor_usertoken';
 const SERVER_TIMEOUT = 30000;
 
+// const timeoutCall = new Promise(resolve => setTimeout(resolve, SERVER_TIMEOUT, 'timeout'));
+
+export function hashPassword(password) {
+	return {
+		digest: sha256(password).toString(),
+		algorithm: "sha-256"
+	}
+}
+
 const Meteor = {
 	TOKEN_KEY,
-	hashPassword(password) {
-		return {
-			digest: sha256(password).toString(),
-			algorithm: "sha-256"
-		}
-	},
 	getUserToken() {
     try {
-      var value = wx.getStorageSync(TOKEN_KEY)
+      var value = wx.getStorageSync(TOKEN_KEY);
       return value;
     } catch (e) {
       console.log('getUserToken error: ', e);

@@ -1,5 +1,5 @@
 //app.js
-import Meteor from './meteor/index';
+import Meteor from './meteor/index'
 
 
 App({
@@ -14,45 +14,60 @@ App({
     Meteor.connect('http://localhost:3000')
 
     Meteor.ddp.on('disconnected', () => {
-      console.log('Meteor ddp disconnected');
-    });
+      console.log('Meteor ddp disconnected')
+    })
     
     Meteor.ddp.on('connected', () => {
-      console.log('Meteor ddp connected');
+      console.log('Meteor ddp connected')
 
       // subscripbe meteor publish
+      let msgSub
       Meteor.subscribe('message.all')
+        .then(result => msgSub = result)
       // listen publish and get data
       Meteor.ddp.on("added", ({collection, id, fields}) => {
-        console.log(collection, id, fields);
-      });
+        console.log(collection, id, fields)
+      })
       Meteor.ddp.on("changed", ({collection, id, fields}) => {
-        console.log(collection, id, fields);
-      });
+        console.log(collection, id, fields)
+      })
       Meteor.ddp.on("removed", ({collection, id, fields}) => {
-        console.log(collection, id, fields);
-      });
+        console.log(collection, id, fields)
+      })
+      // after 5 seconds unsubscribe messages.all
+      setTimeout(() => {
+        msgSub && msgSub.unsubscribe()
+      }, 5000)
+
 
       // list Meteor stream message
       Meteor.ddp.on('stream-messages', (ddpMessage) => {
-        console.log(ddpMessage);
-      });
+        console.log(ddpMessage)
+      })
       // subscribe stream message
+      let streamSub
       Meteor.subscribe('stream-messages', 'rid', false)
+        .then(result => streamSub = result)
+
+      // after 5 seconds stop subscribe rid's messages
+      setTimeout(() => {
+        streamSub && streamSub.unsubscribe()
+      }, 5000)
+
 
       // call send Message
       Meteor.call('sendMessage', 'test message')
         .then(result => {
-          console.log(result);
+          console.log(result)
         })
         .catch(err => {
-          console.log(err);
+          console.log(err)
         })
-    });
+    })
 
     Meteor.ddp.on('error', (err) => {
-      console.log('Meteor ddp connect error', err);
-    });
+      console.log('Meteor ddp connect error', err)
+    })
 
 
     // 登录
