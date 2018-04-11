@@ -9,8 +9,8 @@ App({
     logs.unshift(Date.now())
     wx.setStorageSync('logs', logs)
 
-    // 链接Meteor后端
-
+    // connect Meteor
+    wx.Meteor = Meteor
     Meteor.connect('http://localhost:3000')
 
     Meteor.ddp.on('disconnected', () => {
