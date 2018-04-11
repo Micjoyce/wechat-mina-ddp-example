@@ -89,8 +89,6 @@ module.exports = {
     Data._options = options;
 
     options.endpoint = endpoint;
-
-
     // SocketConstructor = null;
     this.ddp = Data.ddp = new DDP(options);
 
@@ -102,7 +100,6 @@ module.exports = {
     // });
     wx.getNetworkType({
       success: function(res) {
-        console.log("------------------")
         // var networkType = res.networkType // 返回网络类型2g，3g，4g，wifi
         if(Data.ddp.autoReconnect) {
             Data.ddp.connect();
@@ -185,10 +182,11 @@ module.exports = {
     });
     Data.ddp.on("result", message => {
       const call = Data.calls.find(call=>call.id==message.id);
+      // if can't find call return
       if (!call) {
         return console.log(`Cant find message: ${message}, callback`);
       }
-      if(typeof call.callback === 'function') call.callback(message.error, message.result);
+      if(typeof call.callback == 'function') call.callback(message.error, message.result);
       Data.calls.splice(Data.calls.findIndex(call=>call.id==message.id), 1);
     });
 

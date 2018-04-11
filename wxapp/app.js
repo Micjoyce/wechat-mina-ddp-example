@@ -20,7 +20,7 @@ App({
     var Notifications = require('./lib/Notifications');
     wx.Notifications = Notifications;
     Notifications.onAll("sayHello", function(msg){
-      console.log("sayHello", msg);
+      // console.log("sayHello", msg);
     });
 
     var msgStreamer = new Streamer("message");

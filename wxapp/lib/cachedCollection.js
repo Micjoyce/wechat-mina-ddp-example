@@ -11,9 +11,15 @@ class CachedCollectionManager {
 		this.loginCb = [];
 		this.logged = false;
 
-		const _unstoreLoginToken = Accounts._unstoreLoginToken;
-		Accounts._unstoreLoginToken = (...args) => {
-			_unstoreLoginToken.apply(Accounts, args);
+		// const _unstoreLoginToken = Accounts._unstoreLoginToken;
+		// Accounts._unstoreLoginToken = (...args) => {
+		// 	_unstoreLoginToken.apply(Accounts, args);
+		// 	this.clearAllCacheOnLogout();
+		// };
+
+		const _logout = Meteor.logout;
+	   Meteor.logout = (...args) => {
+			_logout.apply(Meteor, args);
 			this.clearAllCacheOnLogout();
 		};
 
