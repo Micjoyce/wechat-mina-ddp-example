@@ -19,12 +19,26 @@ App({
     
     Meteor.ddp.on('connected', () => {
       console.log('Meteor ddp connected');
+
+      // subscripbe meteor publish
+      Meteor.subscribe('message.all')
+      // listen publish and get data
+      Meteor.ddp.on("added", ({collection, id, fields}) => {
+        console.log(collection, id, fields);
+      });
+      Meteor.ddp.on("changed", ({collection, id, fields}) => {
+        console.log(collection, id, fields);
+      });
+      Meteor.ddp.on("removed", ({collection, id, fields}) => {
+        console.log(collection, id, fields);
+      });
+
       // list Meteor stream message
-      Meteor.ddp.on('stream-message', (ddpMessage) => {
+      Meteor.ddp.on('stream-messages', (ddpMessage) => {
         console.log(ddpMessage);
       });
-      // dingy
-      Meteor.subscribe('stream-message', 'all', false)
+      // subscribe stream message
+      Meteor.subscribe('stream-messages', 'rid', false)
 
       // call send Message
       Meteor.call('sendMessage', 'test message')
