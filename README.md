@@ -17,3 +17,4 @@ meteor
 ## step two
 
 Copy <strong>wxapp</strong> to you wechat-mina folder and build.
+
